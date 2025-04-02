@@ -30,3 +30,4 @@ Requisiti minimi per l'installazione:
 ```bash
 ghost start
 ```
+
