@@ -31,3 +31,11 @@ Requisiti minimi per l'installazione:
 ghost start
 ```
 
+# Comandi utili 
+
+1. Build per versione in production:
+
+```bash
+gssg --url http://localhost:2368
+```
+Builda la cartella static da caricare su cortexflow.org/blog
