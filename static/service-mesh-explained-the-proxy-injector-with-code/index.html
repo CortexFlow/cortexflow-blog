@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Service Mesh Explained: the proxy injector (with code)</title>
+    <link rel="stylesheet" href="/assets/built/screen.css?v=c8a39196f3">
+
+    <link rel="canonical" href="http://localhost:2368/service-mesh-explained-the-proxy-injector-with-code/">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    
+    <meta property="og:site_name" content="CortexFlow Blog">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Service Mesh Explained: the proxy injector (with code)">
+    <meta property="og:description" content="Notes
+
+Since all of our functions will live in an asynchronus environment we need to use the async word. Also we will use the #[instrument] flag to enable logging in our code in order to debug the code interactively in case of errors and bugs.
+
+
+Structures
+
+First of all we">
+    <meta property="og:url" content="http://localhost:2368/service-mesh-explained-the-proxy-injector-with-code/">
+    <meta property="og:image" content="http://localhost:2368/content/images/2025/04/pexels-eberhardgross-1612351.jpg">
+    <meta property="article:published_time" content="2025-04-02T12:59:56.000Z">
+    <meta property="article:modified_time" content="2025-04-02T13:14:44.000Z">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Service Mesh Explained: the proxy injector (with code)">
+    <meta name="twitter:description" content="Notes
+
+Since all of our functions will live in an asynchronus environment we need to use the async word. Also we will use the #[instrument] flag to enable logging in our code in order to debug the code interactively in case of errors and bugs.
+
+
+Structures
+
+First of all we">
+    <meta name="twitter:url" content="http://localhost:2368/service-mesh-explained-the-proxy-injector-with-code/">
+    <meta name="twitter:image" content="http://localhost:2368/content/images/2025/04/pexels-eberhardgross-1612351.jpg">
+    <meta name="twitter:label1" content="Written by">
+    <meta name="twitter:data1" content="Lorenzo Tettamanti">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="800">
+    
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "CortexFlow Blog",
+        "url": "http://localhost:2368/",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "http://localhost:2368/favicon.ico",
+            "width": 48,
+            "height": 48
+        }
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Lorenzo Tettamanti",
+        "image": {
+            "@type": "ImageObject",
+            "url": "http://localhost:2368/content/images/2025/04/ChatGPT-Image-1-apr-2025--17_50_43-min.png",
+            "width": 1024,
+            "height": 1024
+        },
+        "url": "http://localhost:2368/author/lorenzo/",
+        "sameAs": []
+    },
+    "headline": "Service Mesh Explained: the proxy injector (with code)",
+    "url": "http://localhost:2368/service-mesh-explained-the-proxy-injector-with-code/",
+    "datePublished": "2025-04-02T12:59:56.000Z",
+    "dateModified": "2025-04-02T13:14:44.000Z",
+    "image": {
+        "@type": "ImageObject",
+        "url": "http://localhost:2368/content/images/2025/04/pexels-eberhardgross-1612351.jpg",
+        "width": 1200,
+        "height": 800
+    },
+    "description": "Notes\n\nSince all of our functions will live in an asynchronus environment we need to use the async word. Also we will use the #[instrument] flag to enable logging in our code in order to debug the code interactively in case of errors and bugs.\n\n\nStructures\n\nFirst of all we need to declare the structures that we need to use in the injector code. We use the &quot;pub&quot; signature to make our functions accessible in the other files of the module.\nThe first structure we need is the AdmissionRequest to send",
+    "mainEntityOfPage": "http://localhost:2368/service-mesh-explained-the-proxy-injector-with-code/"
+}
+    </script>
+
+    <meta name="generator" content="Ghost 5.115">
+    <link rel="alternate" type="application/rss+xml" title="CortexFlow Blog" href="http://localhost:2368/rss/">
+    <script defer src="https://cdn.jsdelivr.net/ghost/portal@~2.50/umd/portal.min.js" data-i18n="true" data-ghost="http://localhost:2368/" data-key="601db81bc1010d0b58bfe1216b" data-api="http://localhost:2368/ghost/api/content/" data-locale="en" crossorigin="anonymous"></script><style id="gh-members-styles">.gh-post-upgrade-cta-content,
+.gh-post-upgrade-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    text-align: center;
+    width: 100%;
+    color: #ffffff;
+    font-size: 16px;
+}
+
+.gh-post-upgrade-cta-content {
+    border-radius: 8px;
+    padding: 40px 4vw;
+}
+
+.gh-post-upgrade-cta h2 {
+    color: #ffffff;
+    font-size: 28px;
+    letter-spacing: -0.2px;
+    margin: 0;
+    padding: 0;
+}
+
+.gh-post-upgrade-cta p {
+    margin: 20px 0 0;
+    padding: 0;
+}
+
+.gh-post-upgrade-cta small {
+    font-size: 16px;
+    letter-spacing: -0.2px;
+}
+
+.gh-post-upgrade-cta a {
+    color: #ffffff;
+    cursor: pointer;
+    font-weight: 500;
+    box-shadow: none;
+    text-decoration: underline;
+}
+
+.gh-post-upgrade-cta a:hover {
+    color: #ffffff;
+    opacity: 0.8;
+    box-shadow: none;
+    text-decoration: underline;
+}
+
+.gh-post-upgrade-cta a.gh-btn {
+    display: block;
+    background: #ffffff;
+    text-decoration: none;
+    margin: 28px 0 0;
+    padding: 8px 18px;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.gh-post-upgrade-cta a.gh-btn:hover {
+    opacity: 0.92;
+}</style>
+    <script defer src="https://cdn.jsdelivr.net/ghost/sodo-search@~1.5/umd/sodo-search.min.js" data-key="601db81bc1010d0b58bfe1216b" data-styles="https://cdn.jsdelivr.net/ghost/sodo-search@~1.5/umd/main.css" data-sodo-search="http://localhost:2368/" data-locale="en" crossorigin="anonymous"></script>
+    
+    <link href="http://localhost:2368/webmentions/receive/" rel="webmention">
+    <script defer src="/public/cards.min.js?v=c8a39196f3"></script>
+    <link rel="stylesheet" type="text/css" href="/public/cards.min.css?v=c8a39196f3">
+    <script defer src="/public/comment-counts.min.js?v=c8a39196f3" data-ghost-comments-counts-api="http://localhost:2368/members/api/comments/counts/"></script>
+    <script defer src="/public/member-attribution.min.js?v=c8a39196f3"></script><style>:root {--ghost-accent-color: #FF1A75;}</style>
+</head>
+
+<body class="post-template is-head-stacked has-serif-body">
+<div class="gh-site">
+
+    <header id="gh-head" class="gh-head gh-outer">
+        <div class="gh-head-inner gh-inner">
+            <div class="gh-head-brand">
+                <div class="gh-head-brand-wrapper">
+                    
+                    <a class="gh-head-logo" href="http://localhost:2368">
+                            CortexFlow Blog
+                    </a>
+                    
+                </div>
+                <button class="gh-search gh-icon-btn" aria-label="Search this site" data-ghost-search><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg></button>
+                <button class="gh-burger"></button>
+            </div>
+
+            <nav class="gh-head-menu">
+                <ul class="nav">
+    <li class="nav-home"><a href="http://localhost:2368/">Home</a></li>
+    <li class="nav-about"><a href="http://localhost:2368/about/">About</a></li>
+</ul>
+
+            </nav>
+
+            <div class="gh-head-actions">
+                    <button class="gh-search gh-icon-btn" aria-label="Search this site" data-ghost-search><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg></button>
+                    <div class="gh-head-members">
+                                <a class="gh-head-link" href="#/portal/signin" data-portal="signin">Sign in</a>
+                                <a class="gh-head-btn gh-btn gh-primary-btn" href="#/portal/signup" data-portal="signup">Subscribe</a>
+                    </div>
+            </div>
+        </div>
+    </header>
+
+    
+<main class="gh-main">
+        <article class="gh-article post">
+
+            <header class="gh-article-header gh-canvas">
+
+                <h1 class="gh-article-title">Service Mesh Explained: the proxy injector (with code)</h1>
+
+
+                    <aside class="gh-article-sidebar">
+
+        <div class="gh-author-image-list instapaper_ignore">
+                <a class="gh-author-image" href="/author/lorenzo/">
+                        <img src="http://localhost:2368/content/images/2025/04/ChatGPT-Image-1-apr-2025--17_50_43-min.png" alt="Lorenzo Tettamanti">
+                </a>
+                <a class="gh-author-image" href="/author/lorenzo-bradanini/">
+                        <div class="gh-author-icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="64" height="64"><g fill="none" fill-rule="evenodd"><path d="M3.513 18.998C4.749 15.504 8.082 13 12 13s7.251 2.504 8.487 5.998C18.47 21.442 15.417 23 12 23s-6.47-1.558-8.487-4.002zM12 12c2.21 0 4-2.79 4-5s-1.79-4-4-4-4 1.79-4 4 1.79 5 4 5z" fill="#FFF"/></g></svg>
+</div>
+                </a>
+        </div>
+
+        <div class="gh-author-name-list">
+                <h4 class="gh-author-name">
+                    <a href="/author/lorenzo/">Lorenzo Tettamanti</a>
+                </h4>
+                ,&nbsp;
+                <h4 class="gh-author-name">
+                    <a href="/author/lorenzo-bradanini/">Lorenzo Bradanini</a>
+                </h4>
+                
+        </div>
+
+        <div class="gh-article-meta">
+            <div class="gh-article-meta-inner">
+                <time class="gh-article-date" datetime="2025-04-02">02 Apr 2025</time>
+                    <span class="gh-article-meta-sep"></span>
+                    <span class="gh-article-length">2 min</span>
+            </div>
+        </div>
+
+    </aside>
+
+                    <figure class="gh-article-image">
+        <img
+            srcset="/content/images/size/w300/2025/04/pexels-eberhardgross-1612351.jpg 300w,
+                    /content/images/size/w720/2025/04/pexels-eberhardgross-1612351.jpg 720w,
+                    /content/images/size/w960/2025/04/pexels-eberhardgross-1612351.jpg 960w,
+                    /content/images/size/w1200/2025/04/pexels-eberhardgross-1612351.jpg 1200w,
+                    /content/images/size/w2000/2025/04/pexels-eberhardgross-1612351.jpg 2000w"
+            sizes="(max-width: 1200px) 100vw, 1200px"
+            src="/content/images/size/w1200/2025/04/pexels-eberhardgross-1612351.jpg"
+            alt="Service Mesh Explained: the proxy injector (with code)"
+        >
+    </figure>
+            </header>
+
+            <section class="gh-content gh-canvas">
+                <h2 id="notes">Notes</h2><p>Since all of our functions will live in an asynchronus environment we need to use the async word. Also we will use the #[instrument] flag to enable logging in our code in order to debug the code interactively in case of errors and bugs.</p><h2 id="structures">Structures</h2><p>First of all we need to declare the structures that we need to use in the injector code. We use the "pub" signature to make our functions accessible in the other files of the module.<br>The first structure we need is the AdmissionRequest to send a request to the admission webhook</p><pre><code>#[derive(Debug, Serialize, Deserialize)]
+pub struct AdmissionRequest {
+    uid: String,
+    object: serde_json::Value,
+}
+</code></pre><p>Then also we need to declare an AdmissionReview structure to process the admission request</p><pre><code>#[derive(Debug, Deserialize, Serialize)]
+pub struct AdmissionReview {
+    #[serde(rename = "apiVersion", default = "default_api_version")]
+    pub api_version: String,
+    #[serde(default = "default_kind")]
+    pub kind: String,
+    pub request: AdmissionRequest,
+    #[serde(skip_deserializing)]
+    pub response: Option&lt;AdmissionResponse&gt;,
+}
+</code></pre><pre><code>fn default_api_version() -&gt; String {
+    "admission.k8s.io/v1".to_string()
+}
+
+fn default_kind() -&gt; String {
+    "AdmissionReview".to_string()
+}
+</code></pre><p>Going forward in our implementation we also need a structure to send a Response back from the Admission webhook, we call this structure "AdmissionResponse"</p><pre><code>#[derive(Debug, Serialize)]
+pub struct AdmissionResponse {
+    uid: String,
+    allowed: bool,
+    patch: Option&lt;String&gt;,
+    #[serde(rename = "patchType")]
+    patch_type: Option&lt;String&gt;,
+}
+
+</code></pre><h2 id="the-injection-logic">The injection logic</h2><pre><code>#[instrument]
+pub async fn inject(
+    State(_state): State&lt;Arc&lt;()&gt;&gt;,
+    Json(mut admission_review): Json&lt;AdmissionReview&gt;,
+) -&gt; Json&lt;AdmissionReview&gt; {
+    let pod = &amp;admission_review.request.object;
+
+    // Log the received pod metadata for debugging
+    info!("Pod metadata: {:?}", pod["metadata"]);
+    info!("Pod annotations: {:?}", pod["metadata"]["annotations"]);
+
+    // Injection logic
+    let response = if check_and_validate_pod(pod).unwrap_or(false) {
+        info!("Starting the proxy injector");
+
+        let patch_string = serde_json::to_string(&amp;*PATCH).unwrap();
+        let patch_encoded = STANDARD.encode(&amp;patch_string);
+
+        info!("Patch to be applied: {}", &amp;patch_string);
+
+        AdmissionResponse {
+            uid: admission_review.request.uid.clone(),
+            allowed: true,
+            patch: Some(patch_encoded),
+            patch_type: Some("JSONPatch".to_string()),
+        }
+    } else {
+        AdmissionResponse {
+            uid: admission_review.request.uid.clone(),
+            allowed: false,
+            patch: None,
+            patch_type: None,
+        }
+    };
+
+    admission_review.response = Some(response);
+    admission_review.api_version = "admission.k8s.io/v1".to_string();
+    admission_review.kind = "AdmissionReview".to_string();
+
+    Json(admission_review)
+}
+
+</code></pre><h2 id="the-patch">The patch</h2><pre><code>use lazy_static::lazy_static;
+use serde_json::Value;
+
+// Container patch
+lazy_static! {
+    pub static ref PATCH: Value = {
+        let json_str = r#"[
+            {
+                "op": "add",
+                "path": "/spec/initContainers",
+                "value": [
+                    {
+                        "name": "init-iptables",
+                        "image": "ubuntu",
+                        "securityContext": {
+                            "capabilities": {
+                                "add": ["NET_ADMIN"]
+                            }
+                        },
+                        "command": [
+                            "/bin/sh", "-c",
+                            "apt-get update &amp;&amp; apt-get install -y iptables &amp;&amp; iptables -t nat -A PREROUTING -p tcp -j REDIRECT --to-port 5054 &amp;&amp; iptables -t nat -A PREROUTING -p udp -j REDIRECT --to-port 5053"
+                        ]
+                    }
+                ]
+            },
+            {
+                "op": "add",
+                "path": "/spec/containers/-",
+                "value": {
+                    "name": "proxy-sidecar",
+                    "image": "lorenzotettamanti/cortexflow-proxy:latest",
+                    "ports": [
+                        {
+                            "containerPort": 5054,
+                            "protocol": "TCP"
+                        },
+                        {
+                            "containerPort": 5053,
+                            "protocol": "UDP"
+                        }
+                    ]
+                }
+            }
+        ]"#;
+        serde_json::from_str(json_str).unwrap()
+    };
+}
+
+</code></pre><h2 id="the-server-logic">The server logic</h2><pre><code>pub async fn run_server() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    let app = Router::new()
+        .route("/mutate", post(inject))
+        .with_state(Arc::new(()));
+
+    let addr = SocketAddr::from(([0, 0, 0, 0], 9443));
+    let config = RustlsConfig::from_pem_file(
+        Path::new("/etc/webhook/certs/..data/tls.crt"),
+        Path::new("/etc/webhook/certs/..data/tls.key"),
+    )
+    .await
+    .map_err(|e| {
+        error!("Failed to load TLS config: {}", e);
+        e
+    })?;
+
+    info!("HTTPS server listening on {}", addr);
+
+    if let Err(e) = axum_server::bind_rustls(addr, config)
+        .serve(app.into_make_service())
+        .await
+    {
+        error!("Server error: {}", e);
+        return Err(Box::new(e));
+    }
+
+    Ok(())
+}
+
+</code></pre>
+            </section>
+
+        </article>
+
+    
+                <div class="gh-comments gh-read-next gh-canvas">
+            <section class="gh-pagehead">
+                <h4 class="gh-pagehead-title">Comments (<script
+    data-ghost-comment-count="67ed34c10575293b10ec487d"
+    data-ghost-comment-count-empty="0"
+    data-ghost-comment-count-singular=""
+    data-ghost-comment-count-plural=""
+    data-ghost-comment-count-tag="span"
+    data-ghost-comment-count-class-name=""
+    data-ghost-comment-count-autowrap="true"
+>
+</script>)</h3>
+            </section>
+            
+        <script defer src="https://cdn.jsdelivr.net/ghost/comments-ui@~1.1/umd/comments-ui.min.js" data-locale="en" data-ghost-comments="http://localhost:2368/" data-api="http://localhost:2368/ghost/api/content/" data-admin="http://localhost:2368/ghost/" data-key="601db81bc1010d0b58bfe1216b" data-title="" data-count="false" data-post-id="67ed34c10575293b10ec487d" data-color-scheme="auto" data-avatar-saturation="60" data-accent-color="#FF1A75" data-comments-enabled="all" data-publication="CortexFlow Blog" crossorigin="anonymous"></script>
+    
+        </div>
+</main>
+
+    <footer class="gh-foot gh-outer">
+        <div class="gh-foot-inner gh-inner">
+                <section class="gh-subscribe">
+                    <h3 class="gh-subscribe-title">Subscribe to CortexFlow Blog</h3>
+                        <div class="gh-subscribe-description">Don&#x27;t miss out on the latest news. Sign up now to get access to the library of members-only articles.</div>
+                    <button class="gh-subscribe-btn gh-btn" data-portal="signup"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <path d="M3.33332 3.33334H16.6667C17.5833 3.33334 18.3333 4.08334 18.3333 5.00001V15C18.3333 15.9167 17.5833 16.6667 16.6667 16.6667H3.33332C2.41666 16.6667 1.66666 15.9167 1.66666 15V5.00001C1.66666 4.08334 2.41666 3.33334 3.33332 3.33334Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M18.3333 5L9.99999 10.8333L1.66666 5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg> Subscribe now</button>
+                </section>
+
+            <nav class="gh-foot-menu">
+                
+            </nav>
+
+            <div class="gh-copyright">
+                    CortexFlow Blog © 2025. Powered by <a href="https://ghost.org/" target="_blank" rel="noopener">Ghost</a>
+            </div>
+        </div>
+    </footer>
+
+</div>
+
+    <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="pswp__bg"></div>
+
+    <div class="pswp__scroll-wrap">
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/assets/built/main.min.js?v=c8a39196f3"></script>
+
+
+
+</body>
+
+</html>

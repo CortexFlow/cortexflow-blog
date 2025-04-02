@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0" xmlns:media="http://search.yahoo.com/mrss/"><channel><title><![CDATA[CortexFlow Blog]]></title><description><![CDATA[Thoughts, stories and ideas.]]></description><link>http://localhost:2368/</link><image><url>http://localhost:2368/favicon.png</url><title>CortexFlow Blog</title><link>http://localhost:2368/</link></image><generator>Ghost 5.115</generator><lastBuildDate>Wed, 02 Apr 2025 18:35:33 GMT</lastBuildDate><atom:link href="http://localhost:2368/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Service Mesh Explained: Service Discovery (with code)]]></title><link>http://localhost:2368/service-mesh-explained-service-discovery-with-code/</link><guid isPermaLink="false">67ed35390575293b10ec488d</guid><dc:creator><![CDATA[Lorenzo Tettamanti]]></dc:creator><pubDate>Wed, 02 Apr 2025 13:02:33 GMT</pubDate><media:content url="http://localhost:2368/content/images/2025/04/pexels-nout-gons-80280-378570.jpg" medium="image"/><content:encoded/></item><item><title><![CDATA[Service Mesh Explained: Sidecar Proxies (with code)]]></title><link>http://localhost:2368/service-mesh-explained-the-proxy-injector-with-code-2/</link><guid isPermaLink="false">67ed35080575293b10ec4885</guid><dc:creator><![CDATA[Lorenzo Tettamanti]]></dc:creator><pubDate>Wed, 02 Apr 2025 13:01:33 GMT</pubDate><media:content url="http://localhost:2368/content/images/2025/04/pexels-hebaysal-773471.jpg" medium="image"/><content:encoded/></item><item><title><![CDATA[Service Mesh Explained: the proxy injector (with code)]]></title><description><![CDATA[<h2 id="notes">Notes</h2><p>Since all of our functions will live in an asynchronus environment we need to use the async word. Also we will use the #[instrument] flag to enable logging in our code in order to debug the code interactively in case of errors and bugs.</p><h2 id="structures">Structures</h2><p>First of all we</p>]]></description><link>http://localhost:2368/service-mesh-explained-the-proxy-injector-with-code/</link><guid isPermaLink="false">67ed34c10575293b10ec487d</guid><dc:creator><![CDATA[Lorenzo Tettamanti]]></dc:creator><pubDate>Wed, 02 Apr 2025 12:59:56 GMT</pubDate><media:content url="http://localhost:2368/content/images/2025/04/pexels-eberhardgross-1612351.jpg" medium="image"/><content:encoded><![CDATA[<h2 id="notes">Notes</h2><img src="http://localhost:2368/content/images/2025/04/pexels-eberhardgross-1612351.jpg" alt="Service Mesh Explained: the proxy injector (with code)"><p>Since all of our functions will live in an asynchronus environment we need to use the async word. Also we will use the #[instrument] flag to enable logging in our code in order to debug the code interactively in case of errors and bugs.</p><h2 id="structures">Structures</h2><p>First of all we need to declare the structures that we need to use in the injector code. We use the &quot;pub&quot; signature to make our functions accessible in the other files of the module.<br>The first structure we need is the AdmissionRequest to send a request to the admission webhook</p><pre><code>#[derive(Debug, Serialize, Deserialize)]
+pub struct AdmissionRequest {
+    uid: String,
+    object: serde_json::Value,
+}
+</code></pre><p>Then also we need to declare an AdmissionReview structure to process the admission request</p><pre><code>#[derive(Debug, Deserialize, Serialize)]
+pub struct AdmissionReview {
+    #[serde(rename = &quot;apiVersion&quot;, default = &quot;default_api_version&quot;)]
+    pub api_version: String,
+    #[serde(default = &quot;default_kind&quot;)]
+    pub kind: String,
+    pub request: AdmissionRequest,
+    #[serde(skip_deserializing)]
+    pub response: Option&lt;AdmissionResponse&gt;,
+}
+</code></pre><pre><code>fn default_api_version() -&gt; String {
+    &quot;admission.k8s.io/v1&quot;.to_string()
+}
+
+fn default_kind() -&gt; String {
+    &quot;AdmissionReview&quot;.to_string()
+}
+</code></pre><p>Going forward in our implementation we also need a structure to send a Response back from the Admission webhook, we call this structure &quot;AdmissionResponse&quot;</p><pre><code>#[derive(Debug, Serialize)]
+pub struct AdmissionResponse {
+    uid: String,
+    allowed: bool,
+    patch: Option&lt;String&gt;,
+    #[serde(rename = &quot;patchType&quot;)]
+    patch_type: Option&lt;String&gt;,
+}
+
+</code></pre><h2 id="the-injection-logic">The injection logic</h2><pre><code>#[instrument]
+pub async fn inject(
+    State(_state): State&lt;Arc&lt;()&gt;&gt;,
+    Json(mut admission_review): Json&lt;AdmissionReview&gt;,
+) -&gt; Json&lt;AdmissionReview&gt; {
+    let pod = &amp;admission_review.request.object;
+
+    // Log the received pod metadata for debugging
+    info!(&quot;Pod metadata: {:?}&quot;, pod[&quot;metadata&quot;]);
+    info!(&quot;Pod annotations: {:?}&quot;, pod[&quot;metadata&quot;][&quot;annotations&quot;]);
+
+    // Injection logic
+    let response = if check_and_validate_pod(pod).unwrap_or(false) {
+        info!(&quot;Starting the proxy injector&quot;);
+
+        let patch_string = serde_json::to_string(&amp;*PATCH).unwrap();
+        let patch_encoded = STANDARD.encode(&amp;patch_string);
+
+        info!(&quot;Patch to be applied: {}&quot;, &amp;patch_string);
+
+        AdmissionResponse {
+            uid: admission_review.request.uid.clone(),
+            allowed: true,
+            patch: Some(patch_encoded),
+            patch_type: Some(&quot;JSONPatch&quot;.to_string()),
+        }
+    } else {
+        AdmissionResponse {
+            uid: admission_review.request.uid.clone(),
+            allowed: false,
+            patch: None,
+            patch_type: None,
+        }
+    };
+
+    admission_review.response = Some(response);
+    admission_review.api_version = &quot;admission.k8s.io/v1&quot;.to_string();
+    admission_review.kind = &quot;AdmissionReview&quot;.to_string();
+
+    Json(admission_review)
+}
+
+</code></pre><h2 id="the-patch">The patch</h2><pre><code>use lazy_static::lazy_static;
+use serde_json::Value;
+
+// Container patch
+lazy_static! {
+    pub static ref PATCH: Value = {
+        let json_str = r#&quot;[
+            {
+                &quot;op&quot;: &quot;add&quot;,
+                &quot;path&quot;: &quot;/spec/initContainers&quot;,
+                &quot;value&quot;: [
+                    {
+                        &quot;name&quot;: &quot;init-iptables&quot;,
+                        &quot;image&quot;: &quot;ubuntu&quot;,
+                        &quot;securityContext&quot;: {
+                            &quot;capabilities&quot;: {
+                                &quot;add&quot;: [&quot;NET_ADMIN&quot;]
+                            }
+                        },
+                        &quot;command&quot;: [
+                            &quot;/bin/sh&quot;, &quot;-c&quot;,
+                            &quot;apt-get update &amp;&amp; apt-get install -y iptables &amp;&amp; iptables -t nat -A PREROUTING -p tcp -j REDIRECT --to-port 5054 &amp;&amp; iptables -t nat -A PREROUTING -p udp -j REDIRECT --to-port 5053&quot;
+                        ]
+                    }
+                ]
+            },
+            {
+                &quot;op&quot;: &quot;add&quot;,
+                &quot;path&quot;: &quot;/spec/containers/-&quot;,
+                &quot;value&quot;: {
+                    &quot;name&quot;: &quot;proxy-sidecar&quot;,
+                    &quot;image&quot;: &quot;lorenzotettamanti/cortexflow-proxy:latest&quot;,
+                    &quot;ports&quot;: [
+                        {
+                            &quot;containerPort&quot;: 5054,
+                            &quot;protocol&quot;: &quot;TCP&quot;
+                        },
+                        {
+                            &quot;containerPort&quot;: 5053,
+                            &quot;protocol&quot;: &quot;UDP&quot;
+                        }
+                    ]
+                }
+            }
+        ]&quot;#;
+        serde_json::from_str(json_str).unwrap()
+    };
+}
+
+</code></pre><h2 id="the-server-logic">The server logic</h2><pre><code>pub async fn run_server() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    let app = Router::new()
+        .route(&quot;/mutate&quot;, post(inject))
+        .with_state(Arc::new(()));
+
+    let addr = SocketAddr::from(([0, 0, 0, 0], 9443));
+    let config = RustlsConfig::from_pem_file(
+        Path::new(&quot;/etc/webhook/certs/..data/tls.crt&quot;),
+        Path::new(&quot;/etc/webhook/certs/..data/tls.key&quot;),
+    )
+    .await
+    .map_err(|e| {
+        error!(&quot;Failed to load TLS config: {}&quot;, e);
+        e
+    })?;
+
+    info!(&quot;HTTPS server listening on {}&quot;, addr);
+
+    if let Err(e) = axum_server::bind_rustls(addr, config)
+        .serve(app.into_make_service())
+        .await
+    {
+        error!(&quot;Server error: {}&quot;, e);
+        return Err(Box::new(e));
+    }
+
+    Ok(())
+}
+
+</code></pre>]]></content:encoded></item><item><title><![CDATA[Service Mesh Explained: What's a service mesh?]]></title><link>http://localhost:2368/service-mesh-explained-whats-a-service-mesh/</link><guid isPermaLink="false">67ed348b0575293b10ec4875</guid><dc:creator><![CDATA[Lorenzo Tettamanti]]></dc:creator><pubDate>Wed, 02 Apr 2025 12:59:08 GMT</pubDate><media:content url="http://localhost:2368/content/images/2025/04/pexels-arist-creathrive-1183525-2253573.jpg" medium="image"/><content:encoded/></item></channel></rss>
