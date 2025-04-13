@@ -28,6 +28,9 @@ jobs:
       - name: Start ghost server
         run: ghost start --production
 
+      - name: Install GSSG command
+        run: npm install -g gssg
+
       - name: Build site
         run: gssg --url http://localhost:2368
 
