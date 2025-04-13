@@ -1,0 +1,38 @@
+name: Publish and Update Blog
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Nodejs
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20.15.0"
+
+      - name: Install dependencies
+        run: npm install ghost-cli@latest -g
+
+      - name: Start ghost server
+        run: ghost start
+
+      - name: Build site
+        run: gssg --url http://localhost:2368
+
+      - name: Rename directory
+        run: mv static cortexflow-blog
+
+      - name: Deploy to site host
+        uses: airvzxf/ftp-deployment-action@latest
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          user: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local_dir: "./cortexflow-blog"
+          remote_dir: ${{ secrets.CF_SITE_DIR_1 }}
