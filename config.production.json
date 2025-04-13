@@ -7,7 +7,7 @@
   "database": {
     "client": "sqlite3",
     "connection": {
-      "filename": "C:\\Users\\loren\\Desktop\\cortexflow-blog\\content\\data\\ghost-local.db"
+      "filename": "content/data/ghost-local.db"
     }
   },
   "mail": {
@@ -18,6 +18,6 @@
   },
   "process": "local",
   "paths": {
-    "contentPath": "C:\\Users\\loren\\Desktop\\cortexflow-blog\\content"
+    "contentPath": "content"
   }
 }
