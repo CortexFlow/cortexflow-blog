@@ -44,4 +44,4 @@ jobs:
           user: ${{ secrets.FTP_USER }}
           password: ${{ secrets.FTP_PWD }}
           local_dir: "./cortexflow-blog"
-          remote_dir: ${{ secrets.FTP_CF_DIR_2 }}
+          remote_dir: ${{ secrets.FTP_CF_DIR_2 }}/cortexflow-blog
