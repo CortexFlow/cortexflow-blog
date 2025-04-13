@@ -40,8 +40,8 @@ jobs:
       - name: Deploy to site host
         uses: airvzxf/ftp-deployment-action@latest
         with:
-          server: ${{ secrets.FTP_SERVER }}
-          user: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
+          server: ${{ secrets.FTP_SRV }}
+          user: ${{ secrets.FTP_USER }}
+          password: ${{ secrets.FTP_PWD }}
           local_dir: "./cortexflow-blog"
-          remote_dir: ${{ secrets.CF_SITE_DIR_1 }}
+          remote_dir: ${{ secrets.FTP_CF_DIR_2 }}
