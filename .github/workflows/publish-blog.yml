@@ -29,7 +29,7 @@ jobs:
         run: ghost start --production
 
       - name: Install GSSG command
-        run: npm install -g gssg
+        run: npm install -g ghost-static-site-generator
 
       - name: Build site
         run: gssg --url http://localhost:2368
