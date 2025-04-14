@@ -34,7 +34,8 @@ jobs:
       - name: Move liebling theme to the Ghost directory
         run: |
           mkdir -p current/content/themes/
-          cp -r ./content/themes/liebling-master current/content/themes/
+          cp -r content/themes/liebling-master current/content/themes/
+          ls
 
       - name: Build site
         run: gssg build --url https://www.cortexflow.org/blog --dest ./static --theme liebling-master
