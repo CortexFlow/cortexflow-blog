@@ -32,7 +32,7 @@ jobs:
         run: npm install -g ghost-static-site-generator
 
       - name: Build site
-        run: gssg build --url https://www.cortexflow.org/blog --dest ./static --theme liebling
+        run: gssg build --url https://www.cortexflow.org/blog --dest ./static --theme liebling-master
 
       - name: Rename directory
         run: mv static cortexflow-blog

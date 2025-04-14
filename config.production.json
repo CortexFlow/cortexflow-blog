@@ -1,5 +1,5 @@
 {
-  "url": "https://www.cortexflow.org/blog",
+  "url": "http://localhost:2368/",
   "server": {
     "port": 2368,
     "host": "127.0.0.1"
