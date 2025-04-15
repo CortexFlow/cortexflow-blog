@@ -1,10 +1,10 @@
 # Site
 name: 'CortexFlow'
 description: 'Cortexflow official theme for cortexflow blog'
-logo: 'assets/images/logo.png'
-favicon: '/assets/images/favicon.ico'
-url: 'https://blog.cortexflow.org'
-baseurl: "/blog"
+logo: "assets/images/logo.png"
+favicon: "/assets/images/favicon.ico"
+url: "https://blog.cortexflow.org"
+baseurl: ""
 disqus: 'blogcortexflow'
 email: 'lorenzotettamanti5@gmail.com'
 
