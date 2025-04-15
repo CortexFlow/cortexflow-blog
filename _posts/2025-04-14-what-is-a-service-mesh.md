@@ -3,7 +3,7 @@ layout: post
 title:  "Service Mesh Explained: What's a service mesh?"
 author: Lorenzo Tettamanti
 categories: [ Cortexflow, service mesh ]
-image: "/assets/images/service-mesh-exaplained.jpg"
+image: "assets/images/service-mesh-exaplained.jpg"
 tags: [service mesh explained]
 ---
 

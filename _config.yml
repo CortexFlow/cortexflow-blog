@@ -2,7 +2,7 @@
 name: "CortexFlow Blog"
 description: "Cortexflow official theme for cortexflow blog"
 logo: "assets/images/logo.png"
-favicon: "/assets/images/favicon.ico"
+favicon: "assets/images/favicon.ico"
 url: "https://blog.cortexflow.org"
 baseurl: ""
 disqus: "blogcortexflow"
@@ -22,7 +22,7 @@ authors:
     lorenzo-tettamati:
       name:           Lorenzo Tettamanti
       site:           https://github.com/LorenzoTettamanti
-      avatar:         "/assets/images/avatar1.jpg"
+      avatar:         "assets/images/avatar1.jpg"
       bio:            ""
       email:          lorenzotettamanti5@gmail.com
       twitter:        
@@ -30,7 +30,7 @@ authors:
     lorenzo-bradanini:
       name:           Lorenzo Bradanini
       site:           https://github.com/lorebrada
-      avatar:         "/assets/images/avatar2.jpg"
+      avatar:         "assets/images/avatar2.jpg"
       bio:            ""
       email:          lorenzolollobradanini@gmail.com
       twitter:        
