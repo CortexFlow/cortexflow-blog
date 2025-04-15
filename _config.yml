@@ -1,12 +1,12 @@
 # Site
-name: 'CortexFlow'
-description: 'Cortexflow official theme for cortexflow blog'
+name: "CortexFlow Blog"
+description: "Cortexflow official theme for cortexflow blog"
 logo: "assets/images/logo.png"
 favicon: "/assets/images/favicon.ico"
 url: "https://blog.cortexflow.org"
 baseurl: ""
-disqus: 'blogcortexflow'
-email: 'lorenzotettamanti5@gmail.com'
+disqus: "blogcortexflow"
+email: "lorenzotettamanti5@gmail.com"
 
 include: ["_pages"]
 permalink: /:title/
@@ -19,7 +19,7 @@ plugins:
   - jekyll-seo-tag
   
 authors:
-    sal:
+    lorenzo-tettamati:
       name:           Lorenzo Tettamanti
       site:           https://github.com/LorenzoTettamanti
       avatar:         "/assets/images/avatar1.jpg"
@@ -27,7 +27,7 @@ authors:
       email:          lorenzotettamanti5@gmail.com
       twitter:        
 
-    jane:
+    lorenzo-bradanini:
       name:           Lorenzo Bradanini
       site:           https://github.com/lorebrada
       avatar:         "/assets/images/avatar2.jpg"

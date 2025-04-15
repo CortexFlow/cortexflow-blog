@@ -35,7 +35,7 @@ Let’s consider an example: an e-commerce platform that features a main page fo
 
 
 
-![Monolithic vs microservices architecture: in a monolithic architecture all the application is concentrated in one place while in a microservices architecture, every service is independent and can be easily maintained without influencing other services](../assets/images/monoliti-vs-microservizi.gif)
+![Monolithic vs microservices architecture: in a monolithic architecture all the application is concentrated in one place while in a microservices architecture, every service is independent and can be easily maintained without influencing other services](/assets/images/monoliti-vs-microservizi.gif)
 _Image: Monolithic vs microservices architecture: in a monolithic architecture all the application is concentrated in one place while in a microservices architecture, every service is independent and can be easily maintained without influencing other services_
 
 ## What is a service mesh?
