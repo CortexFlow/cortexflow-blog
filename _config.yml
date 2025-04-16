@@ -2,7 +2,7 @@
 name: "CortexFlow Blog"
 description: "Cortexflow official theme for cortexflow blog"
 logo: "assets/images/logo.png"
-favicon: "assets/images/favicon.ico"
+favicon: "assets/images/logo.png"
 url: "https://blog.cortexflow.org"
 baseurl: ""
 disqus: "blogcortexflow"
