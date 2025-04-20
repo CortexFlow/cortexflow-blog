@@ -12,20 +12,20 @@ permalink: "/author-lorenzo-bradanini.html"
           <h2 class="font-weight-bold">
             {{page.title}}
             <span class="small btn btn-outline-success btn-sm btn-round"
-              ><a href="{{ site.authors.jane.twitter }}">Follow</a></span
+              ><a href="{{ site.authors.lorenzo-bradanini.twitter }}">Follow</a></span
             >
           </h2>
           <p>
-            <a href="{{ site.authors.jane.site }}"
-              >{{ site.authors.jane.site }}</a
+            <a href="{{ site.authors.lorenzo-bradanini.site }}"
+              >{{ site.authors.lorenzo-bradanini.site }}</a
             >
           </p>
-          <p class="excerpt">{{ site.authors.jane.bio }}</p>
+          <p class="excerpt">{{ site.authors.lorenzo-bradanini.bio }}</p>
         </div>
         <div class="col-md-3 text-right">
           <img
-            alt="{{ site.authors.jane.name }}"
-            src="{{site.baseurl}}/{{ site.authors.jane.avatar }}"
+            alt="{{ site.authors.lorenzo-bradanini.name }}"
+            src="{{site.baseurl}}/{{ site.authors.lorenzo-bradanini.avatar }}"
             class="rounded-circle"
             height="100"
             width="100"
@@ -35,7 +35,7 @@ permalink: "/author-lorenzo-bradanini.html"
       <h4 class="font-weight-bold spanborder">
         <span>Posts by {{page.title}}</span>
       </h4>
-      {% assign posts = site.posts | where:"author","jane" %} {% for post in
+      {% assign posts = site.posts | where:"author","lorenzo-bradanini" %} {% for post in
       posts %} {% include main-loop-card.html %} {% endfor %}
     </div>
   </div>

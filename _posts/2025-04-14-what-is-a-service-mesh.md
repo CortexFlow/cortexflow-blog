@@ -2,7 +2,7 @@
 layout: post
 title:  "Service Mesh Explained: What's a service mesh?"
 description: "An in-depth exploration of service mesh architecture — what it is, how it works, and why it's essential for modern microservices environments."
-author: lorenzo-tettamati 
+author: lorenzo-tettamati
 categories: [ Cortexflow, service mesh ]
 image: "assets/images/service-mesh-exaplained.jpg"
 tags: [service mesh explained]
