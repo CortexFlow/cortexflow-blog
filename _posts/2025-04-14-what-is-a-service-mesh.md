@@ -5,7 +5,7 @@ description: "An in-depth exploration of service mesh architecture — what it i
 author: lorenzo-tettamati
 categories: [ Cortexflow, service mesh ]
 image: "assets/images/service-mesh-exaplained.jpg"
-tags: [service mesh explained]
+tags: [service mesh explained,featured]
 ---
 
 Hey there, super curious minds,

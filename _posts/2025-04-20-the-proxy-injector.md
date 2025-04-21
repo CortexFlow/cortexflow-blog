@@ -1,11 +1,11 @@
 ---
 layout: post
-title:  "Service Mesh Explained: The proxy injector (with code)?"
+title:  "Service Mesh Explained: The proxy injector (with code)"
 description: "How to build a proxy injector for a service mesh using Rust. Understand how it works and why it's essential for automating sidecar injection in Kubernetes."
 author: lorenzo-tettamati 
 categories: [ Cortexflow, service mesh ]
 image: "assets/images/the-proxy-injector.jpg"
-tags: [service mesh explained]
+tags: [service mesh explained,featured]
 ---
 
 Kubernetes service meshes rely on “sidecar” proxies to transparently handle traffic routing, security 
