@@ -1,28 +1,34 @@
 ---
 layout: post
 title:  "Service Mesh Explained: The proxy injector (with code)"
-description: "How to build a proxy injector for a service mesh using Rust. Understand how it works and why it's essential for automating sidecar injection in Kubernetes."
+description: "What is proxy injector? How an Admission Webhook works? Deep dive into the essential components for automating sidecar injection in Kubernetes."
 author: lorenzo-tettamati 
 categories: [ Cortexflow, service mesh ]
 image: "assets/images/the-proxy-injector.jpg"
-tags: [service mesh explained,featured]
+tags: [service mesh explained,featured,Rust,tutorial]
 ---
 
-Kubernetes service meshes rely on “sidecar” proxies to transparently handle traffic routing, security 
+Kubernetes service meshes rely on **“sidecar”** proxies to transparently handle traffic routing, security 
 policies, and observability for your microservices—but manually bolting those proxies onto every Pod 
-spec quickly becomes a maintenance nightmare. What if you could have Kubernetes do the work for 
-you, automatically injecting the proxy whenever a Pod is created? 
+spec quickly becomes a maintenance nightmare.
+
+_What if you could have Kubernetes do the work for you, automatically injecting the proxy whenever a Pod is created?_ 
+
 In this tutorial, we’re going to build exactly that: a **Mutating Admission Webhook** in Rust that hooks 
 into the Kubernetes API server, inspects incoming Pod specs, and—if they meet your criteria—patches 
 them on the fly to include both an init‑container (for iptables setup) and your proxy‑sidecar.   
-Along the way you’ll learn how to: - Define the AdmissionReview/AdmissionRequest and AdmissionResponse data structures (with 
-Serde)   - Wire up an async handler in Axum, complete with `#[instrument]` tracing for per-request logging   - Craft a JSONPatch that adds init‑containers and sidecar containers via a base64-encoded payload   - Stand up a TLS‑secured gRPC/HTTP2 server using Rustls so Kubernetes can trust your webhook   
+
+Along the way you’ll learn how to: 
+- Define the AdmissionReview/AdmissionRequest and AdmissionResponse data structures (with 
+Serde)   
+- Wire up an async handler in Axum, complete with `#[instrument]` tracing for per-request logging   
+- Craft a JSONPatch that adds init‑containers and sidecar containers via a base64-encoded payload   - Stand up a TLS‑secured gRPC/HTTP2 server using Rustls so Kubernetes can trust your webhook   
+
 By the end, you’ll have a drop‑in proxy injector that can be deployed alongside your service mesh 
 control plane—no more manual YAML editing, no more drift, just automatic, consistent proxy injection 
 across your cluster. Let’s dive in!
+## Admission Webhooks
 
-## Notes
-Since all of our functions will live in an asynchronus environment we need to use the async word. Also we will use the #[instrument] flag to enable logging in our code in order to debug the code interactively in case of errors and bugs.
 ## Structures
 
 First of all we need to declare the structures that we need to use in the injector code. We use the "pub" signature to make our functions accessible in the other files of the module.
