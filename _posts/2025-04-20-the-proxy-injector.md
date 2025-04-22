@@ -254,6 +254,35 @@ lazy_static! {
 
 ```
 ## Building a Proxy injector: The server logic 
+In the last part we need to create a server to serve the API we made in the previous step. For this step we use the axum crate and we proceed creating a route. We decided to call the endpoint `/mutate` as a reminder for our **Mutating Admission Webhook*. As second step we proceed to associate the inject function as POST request and we bind the 9443, this ends the route configuration. The last step is to load the *TLS* certificate files tls.crt and tls.key. 
+
+_**Note:**
+Kubernetes requires TLS certificates to serve APIs over HTTPS. Failing to provide the certificates will result in a non-functional webhook service_
+
+_How to generate a TLS certificate?_  
+Working with TLS certificates may be something unfamiliar to the majority of people reading this article, cert-manager is the easiest way to generate the tls.key and tls.crt keys. All you have to do is installing cert-manager using the kubernetes CLI
+```
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/latest/download/cert-manager.yaml
+```
+The installation may take a while so you can take a small break to let your mind rest a little bit!  
+After cert-manager is installed you can get the secrets using the following commands
+1. Return the data.ca file
+```
+kubectl get secret proxy-injector-tls -n cortexflow -o jsonpath='{.data.ca\.crt}'
+```
+2. Return the tls.key file
+```
+kubectl get secret proxy-injector-tls -n cortexflow -o jsonpath='{.data.tls\.key}'
+```
+3. Return the tls.crt file
+```
+kubectl get secret proxy-injector-tls -n cortexflow -o jsonpath='{.data.tls\.crt}'
+```
+
+_**Note:**
+For security reasons, do not share these secrets with anyone. Leaking them may compromise your system’s security and get you in trouble._
+
+We decided to automate this process in the install.sh script that you can find in the [repository](https://github.com/CortexFlow/CortexBrain/blob/58d97ca96cf79b82363c6553240e996409a667b0/Scripts/install.sh#L4) 
 
 ```
 pub async fn run_server() -> Result<(), Box<dyn std::error::Error>> {
@@ -285,7 +314,8 @@ pub async fn run_server() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-##Conclusions
+```
+## Conclusion
 
 
 In the first part, we've covered the foundamentals of proxy injection,going through admission webhooks and admission controllers, while in the part we have built all the logic from scratch using the Rust programming language
@@ -293,6 +323,5 @@ In the first part, we've covered the foundamentals of proxy injection,going thro
 
 In the next part of this series, we’ll create the sidecar proxy and all the basic functions such as service discovery, metrics and observability 🚀
 
+Until that don't forget to read the first episode of this serie where we deep dive into service mesh!  
 **Stay tuned—and stay curious.** 🌐🧩
-
-```
