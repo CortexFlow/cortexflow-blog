@@ -112,6 +112,38 @@ pub struct AdmissionResponse {
 
 ```
 ## Building a Proxy injector: The injection logic
+After defining the main structures we need to create the proper injection logic. We want a modular logic that can adapt to future changes and users needs while mantaining a simple program structure. First of all, we need to create a simple function called `check_and_validate_pod`. This function ensure that the pod meets our requirements before injecting the sidecar proxy into a pod. 
+The function follows this logic:
+- **Checks if containers are present**
+  - Iterates over each container in the pod's `spec.containers`.
+  - If a container's name contains `"cortexflow-proxy"`:
+    - Logs an error.
+    - Returns an error: `"The pod is not eligible for proxy injection. Sidecar proxy already present."`
+
+- **Validates namespace annotations**
+  - Retrieves the pod's namespace from `metadata.namespace`.
+  - Checks `metadata.annotations` for the key `"proxy-injection"`.
+    - If it's set to `"disabled"`:
+      - Logs a warning.
+      - Returns an error: `"Automatic namespace injection is disabled."`
+
+- **Validates pod-level annotations**
+  - Checks if the pod itself has `"proxy-injection": "disabled"` in `metadata.annotations`.
+    - If so:
+      - Logs a warning.
+      - Returns an error: `"Automatic pod injection is disabled."`
+
+- **If all checks pass**
+  - Returns `Ok(true)` indicating the pod is eligible for injection.
+
+For the sake of brevity I am not including the code below but you can find the `check_and_validate_pod` code [here](https://github.com/CortexFlow/CortexBrain/blob/main/core/src/components/proxy-injector/src/validation.rs).
+
+Going back to our inject function, after calling the validation function we expect two behaviours:
+1. The pod is ready and eligible for injection
+2. The pod is not eligible for injection
+
+In the first case we can apply the patch, which we'll define in the next chapter, and return an `allowed: true` Admission Response.
+In the second case we are not injecting the patch and we return an `allowed:false` Admission Response.
 
 ```
 #[instrument]
@@ -159,6 +191,17 @@ pub async fn inject(
 ```
 
 ## Building a Proxy injector: The patch
+Now the magic happens. The patch is one of most crucial part in the proxy injector and is where all the variables are defined. We are using serde_json to create a JSON Patch and lazy_static to optimize the resources initializing the variable when it is first accessed in contrast to the regular static data, which is initialized at compile time.
+The patch is divided into two parts:
+1. Initialize Iptables
+2. Initialize the proxy
+
+In the first part we are using iptables to redirect all the external traffic, in particular the TCP and UDP traffic, to specific ports. We decided to bind the TCP traffic to the 5054 port and the UDP traffic to the 5053 port.  
+
+_**Note:**
+The init-iptables operation cannot be skipped otherwise our system will not bound the traffic to the port we choose,resulting in endless hours of debugging_  
+
+In the second part we're doing another `add` operation to include the image of the proxy server,also we're explicitely setting the TCP (5054) and UDP (5053)ports using the `containerPort` key
 ```
 use lazy_static::lazy_static;
 use serde_json::Value;
@@ -241,5 +284,15 @@ pub async fn run_server() -> Result<(), Box<dyn std::error::Error>> {
 
     Ok(())
 }
+
+##Conclusions
+
+
+In the first part, we've covered the foundamentals of proxy injection,going through admission webhooks and admission controllers, while in the part we have built all the logic from scratch using the Rust programming language
+
+
+In the next part of this series, we’ll create the sidecar proxy and all the basic functions such as service discovery, metrics and observability 🚀
+
+**Stay tuned—and stay curious.** 🌐🧩
 
 ```
