@@ -4,7 +4,7 @@ title:  "Service Mesh Explained: Building a Proxy Injector in Rust (with Code)"
 description: "What is proxy injector? How an Admission Webhook works? Deep dive into the essential components for automating sidecar injection in Kubernetes."
 author: lorenzo-tettamati 
 categories: [ Cortexflow, service mesh,tutorial ]
-image: "assets/images/the-proxy-injector.jpg"
+image: "assets/images/the-proxy-injector.webp"
 tags: [service mesh explained,featured,Rust,tutorial]
 ---
 Kubernetes service meshes rely on **“sidecar”** proxies to handle traffic routing transparently, security 
